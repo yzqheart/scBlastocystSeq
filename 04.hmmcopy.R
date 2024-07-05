@@ -13,8 +13,8 @@ normal_reads <- wigsToRangedData(rfile, gfile, mfile)
 normal_copy <- correctReadcount(normal_reads)
 #normal_copy[100:110, ]
 
-tumour_segments <- HMMsegment(normal_copy)
-#tumour_segments[10:110, ]
+final_segments <- HMMsegment(normal_copy)
+#final_segments[10:110, ]
 
 write.csv(normal_copy,file = paste0(sample.name,".hmmcopy.win1000000.corrected.csv"),row.names = F,quote = F)
-write.csv(tumour_segments$segs,file = paste0(sample.name,".hmmcopy.win1000000.segment.csv"),row.names = F,quote = F)
+write.csv(final_segments$segs,file = paste0(sample.name,".hmmcopy.win1000000.segment.csv"),row.names = F,quote = F)
