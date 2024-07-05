@@ -3,7 +3,6 @@ fq2=$2 # trimmed r2
 outdir=$3 # output dir
 sample=$4 # sample name
 
-PICARD="java -Xmx120g -jar /mnt/data/yanzhiqiang/142/software/picard-tools-1.141/picard.jar"
 index=/mnt/data/yanzhiqiang/138/DB/Homo_sapiens/UCSC/hg38/Sequence/BWAIndex/genome.fa
 
 ID=$sample
