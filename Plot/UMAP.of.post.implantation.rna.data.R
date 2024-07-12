@@ -1,6 +1,5 @@
 ####### cell type identification in kidney ###########
 rm(list=ls())
-.libPaths(c("/mnt/data/kongsiming/software/Rlib" , .libPaths()))
 palette <- c("#4DBBD5FF","#E64B35FF","#00A087FF","#3C5488FF","#F39B7FFF","#8491B4FF","#91D1C2FF","#DC0000FF",
                   "#A23B2CFF","#815D45FF","#B09C85FF","#B1716CFF","#2FB0B7FF","#7C98A3FF","#197F87FF","#BB9599FF")
 
@@ -12,19 +11,18 @@ library(Seurat)
 library(dplyr)
 library(patchwork)
 
-count <- read.table("postimplantaion.raw.counts.txt",header = T,sep = "\t") # each row is a gene and each column is a single cell
-dim(count)
-head(count[1:6,1:6])
+count <- read.table("postimplantaion.raw.counts.txt",header = T,row.names=1,sep = "\t") # each row is a gene and each column is a single cell
+count[1:3,1:3]
+# gene	D8_IVC2_E1_B1_33 D8_IVC2_E1_B1_34 D8_IVC2_E1_B1_35
+# A1BG 0 2 0
+# A1BG-AS1 0 0 0
+# A1CF 0 0 0
+
 temp <- sweep(count,2,colSums(count),"/")
 tpm <- temp*1000000
 mytpm <- log2(tpm +1)
 head(mytpm[1:6,1:6])
 
-colnames(mytpm)<-gsub("X.mnt.data.kongsiming.clinical_ZF.mosaic.post.implantation.05.star.map.map2.","",colnames(mytpm))
-colnames(mytpm)<-gsub("Aligned.sortedByCoord.out.bam","",colnames(mytpm))
-
-#rownames(count) <- count[,1]
-#count <- count[,-1]
 # Initialize the Seurat object with the raw (non-normalized data).
 
 data <- CreateSeuratObject(counts =mytpm,project = "post.implantation",min.cells =3, min.features = 2000)
@@ -105,13 +103,13 @@ genes_ysTE <- c("CD44")
 
 genes_all <- c(genes_EPI,genes_PE,genes_TE,genes_ysTE)
 #DotPlot(data,features = genes_all)
-pdf("/mnt/data/kongsiming/clinical_ZF/mosaic/post.implantation/plot/figures/cell.type.pdf",width = 20,height = 40)
+pdf("cell.type.pdf",width = 20,height = 40)
 VlnPlot(data,features = genes_all)
 FeaturePlot(data,genes_all,pt.size = 1,reduction = "tsne")
 FeaturePlot(data,genes_all,pt.size = 1,reduction = "umap")
 dev.off()
 
-pdf("/mnt/data/kongsiming/clinical_ZF/mosaic/post.implantation/plot/figures/cell.type.dotplot.pdf",width = 20,height = 10)
+pdf("cell.type.dotplot.pdf",width = 20,height = 10)
 DotPlot(object = data, features = genes_all)
 dev.off()
 
@@ -122,11 +120,11 @@ dev.off()
 data@meta.data$free.annotation <- plyr::mapvalues(from = c(9,13,0,1,2,3,4,5,6,7,8,10,11,12,14,15),
                                                   to = c("EPI","PE","TE","TE","TE","TE","TE","TE","TE","TE","TE","TE","TE","TE","TE","ysTE"),
                                                   x= data@meta.data$seurat_clusters)
-pdf("/mnt/data/kongsiming/clinical_ZF/mosaic/post.implantation/plot/figures/post.implantation.cell.type.cluster.2.15.pdf")
+pdf("post.implantation.cell.type.cluster.2.15.pdf")
 TSNEPlot(object = data,group.by= "free.annotation",label=T, cols = palette)    
 UMAPPlot(object = data,group.by= "free.annotation",label=T, cols = palette)   
 dev.off()
-# saveRDS(data, file = "/mnt/data/kongsiming/clinical_ZF/mosaic/post.implantation/plot/figures/data.post.implantation.2.15.rds")
+# saveRDS(data, file = "data.post.implantation.2.15.rds")
 ###################### extract cluster ###############################
 table(data@active.ident) 
 table(Idents(data))
@@ -134,6 +132,6 @@ table(data$RNA_snn_res.0.6)
 
 # extract cell type
 tmp2 <- as.data.frame(data@active.ident)
-write.table(data@meta.data,file = "/mnt/data/kongsiming/clinical_ZF/mosaic/post.implantation/plot/figures/cell.cluster.final.2.15.txt",quote = F,sep = '\t',row.names = T,col.names = T)
+write.table(data@meta.data,file = "cell.cluster.final.2.15.txt",quote = F,sep = '\t',row.names = T,col.names = T)
 
 
